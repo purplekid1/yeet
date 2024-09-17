@@ -7,11 +7,18 @@ public class PlayerController : MonoBehaviour
     Rigidbody myRB;
     Camera playerCam;
 
+
     Vector2 camRotation;
 
+    [Header("Movement Stats")]
+    public bool sprinting = false;
     public float speed = 10f;
     public float jumpHeight = 5f;
+    public float groundDetection = 1.0f;
+    public float sprintMult = 1.25f;
 
+    [Header("Settings")]
+    public bool sprintToggle = false;
     public float mouseSensitivity = 2.0f;
     public float Xsensitivity = 2.0f;
     public float Ysensitivity = 2.0f;
@@ -25,7 +32,7 @@ public class PlayerController : MonoBehaviour
         myRB = GetComponent<Rigidbody>();
         playerCam = transform.GetChild(0).GetComponent<Camera>();
 
-        camRotation = Vector3.zero;
+        camRotation = Vector2.zero;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
 
@@ -34,23 +41,48 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+
 
         camRotation.x += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
 
+        camRotation.y = Mathf.Clamp(camRotation.y, -camRotationLimit, camRotationLimit);
+
+
         playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
+        if (!sprinting)
+        {
+            if ((!sprintToggle && Input.GetKey(KeyCode.LeftShift)) || (sprintToggle && (Input.GetAxisRaw("vertical") > 0) && Input.GetKey(KeyCode.LeftShift)))
+            {
+                sprinting = true;
+            }
+        }
+  
+
+
         Vector3 temp = myRB.velocity;
 
-        temp.z = Input.GetAxisRaw("Horizontal") * speed;
-        temp.x = Input.GetAxisRaw("Vertical") * speed;
+        temp.x = Input.GetAxisRaw("Horizontal") * speed;
+        temp.z = Input.GetAxisRaw("Vertical") * speed;
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (sprinting)
+        {
+            temp.z *= sprintMult;
+        }
+
+        if (sprinting && !sprintToggle && Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            sprinting = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && Physics.Raycast(transform.position, -transform.up, groundDetection))
         {
             temp.y = jumpHeight;
         }
 
-        myRB.velocity = (transform.forward * temp.x) + (transform.right * temp.z) + (transform.up * temp.y);
+        myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
     }
 }
