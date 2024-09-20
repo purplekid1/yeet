@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
 
 public class PlayerController : MonoBehaviour
 {
@@ -38,9 +41,14 @@ public class PlayerController : MonoBehaviour
     public float jumpHeight = 5f;
     public float groundDetection = 1.0f;
     public float sprintMult = 1.25f;
+    public bool crouching = false;
+    public float playerHeight = 1;
+    public float crouchSpeed = 0.5f;
+    public bool jumpOn = false;
 
     [Header("Settings")]
     public bool sprintToggle = false;
+    public bool crouchingToggle = false;
     public float mouseSensitivity = 2.0f;
     public float Xsensitivity = 2.0f;
     public float Ysensitivity = 2.0f;
@@ -63,8 +71,8 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
 
+        playerHeight = transform.localScale.y;
 
         camRotation.x += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
         camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
@@ -117,12 +125,48 @@ public class PlayerController : MonoBehaviour
             sprinting = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && Physics.Raycast(transform.position, -transform.up, groundDetection))
+        if (Physics.Raycast(transform.position, -transform.up, groundDetection))
         {
-            temp.y = jumpHeight;
+            jumpOn = true;
+        }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+
+            if (jumpOn)
+            {
+                jumpOn = false;
+                temp.y = jumpHeight; 
+
+            }
+            
         }
 
-        myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
+        
+        if (crouching)
+            myRB.velocity = (transform.forward * temp.z * crouchSpeed) + (transform.right * temp.x * crouchSpeed) + (transform.up * temp.y);
+        else
+            myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
+
+        if (Input.GetKey(KeyCode.LeftControl) || (Input.GetKey(KeyCode.C)))
+        {
+            if (transform.localScale.y > 0.5f)
+            {
+                transform.localScale -= Vector3.up * Time.deltaTime;
+
+                crouching = true;
+            }
+            else transform.localScale = Vector3.one - (Vector3.up * 0.5f);
+        }
+        else
+        {
+            if (transform.localScale.y < 1)
+            {
+                transform.localScale += Vector3.up * Time.deltaTime;
+
+                crouching = false;
+            }
+            else transform.localScale = Vector3.one;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -152,6 +196,16 @@ public class PlayerController : MonoBehaviour
             }
 
             Destroy(collision.gameObject);
+        }
+
+        if (collision.gameObject.tag == "wall")
+        {
+            if (Physics.Raycast(transform.position + transform.right * 0.5f, transform.right))
+            {
+                myRB.velocity += Physics.gravity * 0.5f * Time.deltaTime;
+                jumpOn = true;
+
+            }
         }
     }
 
