@@ -129,15 +129,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b21a080bc7bef434083a5b65db9fbbc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myRB: {fileID: 0}
+  playerCam: {fileID: 0}
+  weaponSlot: {fileID: 0}
+  shot: {fileID: 0}
+  canFire: 1
+  fireRate: 0
+  shotVel: 0
+  weaponID: -1
+  fireMode: 0
+  currentClip: 0
+  clipSize: 0
+  maxAmmo: 0
+  currentAmmo: 0
+  reloadAmt: 0
+  bulletLifeSpan: 0
+  ammoPickUp: 0
+  isReloading: 0
+  bulletCounter: {fileID: 0}
   maxHealth: 5
   health: 10
   healthPickUp: 5
   sprinting: 0
   speed: 10
+  wallRunSpeed: 10
   jumpHeight: 10
   groundDetection: 2
   sprintMult: 2
+  crouching: 0
+  playerHeight: 1
+  crouchSpeed: 5
+  jumpOn: 0
+  isWallRunning: 0
+  leanAmount: 15
+  leanSpeed: 5
   sprintToggle: 0
+  crouchingToggle: 0
   mouseSensitivity: 5
   Xsensitivity: 2
   Ysensitivity: 2

@@ -7,8 +7,8 @@ using Cursor = UnityEngine.Cursor;
 
 public class PlayerController : MonoBehaviour
 {
-    Rigidbody myRB;
-    Camera playerCam;
+    public Rigidbody myRB;
+    public Camera playerCam;
 
 
     [Header("Weapon Stats")]
@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviour
     public float reloadAmt = 0;
     public float bulletLifeSpan = 0;
     public int ammoPickUp = 0;
+    public bool isReloading = false;
+    public BulletCounter bulletCounter;
 
 
     [Header("Player Stats")]
@@ -38,13 +40,15 @@ public class PlayerController : MonoBehaviour
     [Header("Movement Stats")]
     public bool sprinting = false;
     public float speed = 10f;
+    public float wallRunSpeed = 10f;
     public float jumpHeight = 5f;
     public float groundDetection = 1.0f;
     public float sprintMult = 1.25f;
     public bool crouching = false;
-    public float playerHeight = 1;
-    public float crouchSpeed = 0.5f;
+    public float playerHeight = 1f;
+    public float crouchSpeed = 5f;
     public bool jumpOn = false;
+    
 
     [Header("Settings")]
     public bool sprintToggle = false;
@@ -65,6 +69,7 @@ public class PlayerController : MonoBehaviour
         camRotation = Vector2.zero;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
+        bulletCounter.Initialize((int)currentAmmo);
 
     }
 
@@ -129,8 +134,10 @@ public class PlayerController : MonoBehaviour
         {
             jumpOn = true;
         }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            
 
             if (jumpOn)
             {
@@ -167,6 +174,8 @@ public class PlayerController : MonoBehaviour
             }
             else transform.localScale = Vector3.one;
         }
+
+       
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -198,16 +207,10 @@ public class PlayerController : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        if (collision.gameObject.tag == "wall")
-        {
-            if (Physics.Raycast(transform.position + transform.right * 0.5f, transform.right))
-            {
-                myRB.velocity += Physics.gravity * 0.5f * Time.deltaTime;
-                jumpOn = true;
-
-            }
-        }
+       
     }
+
+    
 
     private void OnTriggerEnter(Collider other)
     {
@@ -248,29 +251,66 @@ public class PlayerController : MonoBehaviour
         canFire = true;
     }
 
+
+
     public void reloadClip()
     {
-        if (currentClip >= clipSize)
+        // Check if already reloading or if the clip is full
+        if (isReloading || currentClip >= clipSize)
         {
             return;
-        } 
+        }
+
+        isReloading = true; // Set reloading state
+        canFire = false; // Disable firing while reloading
+
+        // Calculate how much ammo to reload
+        float reloadCount = clipSize - currentClip;
+
+        // Perform the reload
+        if (currentAmmo < reloadCount)
+        {
+            currentClip += currentAmmo; // Reload with whatever is left
+            currentAmmo = 0; // Clear current ammo
+        }
         else
         {
-            float reloadCount = clipSize - currentClip;
-
-            if (currentClip < reloadCount)
-            {
-                currentClip += currentAmmo;
-                currentAmmo = 0;
-                return;
-            
-            }
-            else
-            {
-                currentClip += reloadCount;
-                currentAmmo = reloadCount;
-                return;
-            }
+            currentClip += reloadCount; // Fill the clip
+            currentAmmo -= reloadCount; // Reduce current ammo
         }
-    }   
+
+        bulletCounter.UpdateAmmoCount((int)currentAmmo);
+
+        // Simulate a reload time (for example, 1 second)
+        StartCoroutine(ReloadCooldown());
+    }
+
+    private IEnumerator ReloadCooldown()
+    {
+        yield return new WaitForSeconds(1f); // Adjust this duration as needed
+        isReloading = false; // Reset reloading state
+        canFire = true; // Enable firing again
+    }
+
+    // Call this method when the reload button is pressed
+    public void OnReloadButtonPressed()
+    {
+        reloadClip();
+    }
+
+    // Example of firing method
+    public void Fire()
+    {
+        if (!canFire) return; // Prevent firing if reloading
+
+        if (currentClip > 0)
+        {
+            currentClip--; // Decrease the ammo in the clip
+            bulletCounter.UpdateAmmoCount((int)currentAmmo);
+        }
+        // Firing logic here
+    }
+
+    
+    
 }
