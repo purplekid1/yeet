@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 using Cursor = UnityEngine.Cursor;
 
 public class PlayerController : MonoBehaviour
@@ -31,6 +32,8 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("Player Stats")]
+    public bool takenDamage = false;
+    public float damageCoolDown = 0.5f;
     public int maxHealth = 5;
     public int health = 10;
     public int healthPickUp = 5;
@@ -76,6 +79,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (health <= 0)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
 
         playerHeight = transform.localScale.y;
 
@@ -250,6 +258,12 @@ public class PlayerController : MonoBehaviour
     {
         yield return new WaitForSeconds(fireRate);
         canFire = true;
+    }
+
+    public IEnumerator coolDownDamage()
+    {
+        yield return new WaitForSeconds(damageCoolDown);
+        takenDamage = true;
     }
 
 

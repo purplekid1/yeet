@@ -9,6 +9,7 @@ TagManager:
   - APU
   - bullet
   - wall
+  - basicEnemy
   layers:
   - Default
   - TransparentFX
