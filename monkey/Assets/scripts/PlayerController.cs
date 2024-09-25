@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public Rigidbody myRB;
     public Camera playerCam;
 
+    Transform cameraHolder;
+
 
     [Header("Weapon Stats")]
     public Transform weaponSlot;
@@ -67,7 +69,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         myRB = GetComponent<Rigidbody>();
-        playerCam = transform.GetChild(0).GetComponent<Camera>();
+        playerCam = Camera.main;
+        cameraHolder = transform.GetChild(0);
 
         camRotation = Vector2.zero;
         Cursor.visible = false;
@@ -91,9 +94,9 @@ public class PlayerController : MonoBehaviour
         camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
 
         camRotation.y = Mathf.Clamp(camRotation.y, -camRotationLimit, camRotationLimit);
+        playerCam.transform.position = cameraHolder.position;
 
-
-        playerCam.transform.localRotation = Quaternion.AngleAxis(camRotation.y, Vector3.left);
+        playerCam.transform.localRotation = Quaternion.Euler(-camRotation.y, camRotation.x, 0);
         transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
         if (Input.GetMouseButton(0) && canFire && currentClip >  0 && weaponID >= 0)
@@ -236,7 +239,7 @@ public class PlayerController : MonoBehaviour
                 case "Weapon1":
                 
                     weaponID = 0;
-                    shotVel = 10000;
+                    shotVel = 4500;
                     fireMode = 0;
                     fireRate = 0.1f;
                     currentClip = 20;
