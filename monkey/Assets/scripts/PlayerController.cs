@@ -196,7 +196,9 @@ public class PlayerController : MonoBehaviour
         {
             if (health + healthPickUp > maxHealth) 
             {
-            health = maxHealth;
+                 
+                health = maxHealth;
+
             } else
             {
                 health += healthPickUp;
