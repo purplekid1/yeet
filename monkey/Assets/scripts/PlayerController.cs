@@ -30,7 +30,6 @@ public class PlayerController : MonoBehaviour
     public float bulletLifeSpan = 0;
     public int ammoPickUp = 0;
     public bool isReloading = false;
-    public BulletCounter bulletCounter;
 
 
     [Header("Player Stats")]
@@ -75,7 +74,6 @@ public class PlayerController : MonoBehaviour
         camRotation = Vector2.zero;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
-        bulletCounter.Initialize((int)currentAmmo);
 
     }
 
@@ -268,7 +266,7 @@ public class PlayerController : MonoBehaviour
     public IEnumerator coolDownDamage()
     {
         yield return new WaitForSeconds(damageCoolDown);
-        takenDamage = true;
+        takenDamage = false;
     }
 
 
@@ -299,7 +297,6 @@ public class PlayerController : MonoBehaviour
             currentAmmo -= reloadCount; // Reduce current ammo
         }
 
-        bulletCounter.UpdateAmmoCount((int)currentAmmo);
 
         // Simulate a reload time (for example, 1 second)
         StartCoroutine(ReloadCooldown());
@@ -326,7 +323,6 @@ public class PlayerController : MonoBehaviour
         if (currentClip > 0)
         {
             currentClip--; // Decrease the ammo in the clip
-            bulletCounter.UpdateAmmoCount((int)currentAmmo);
         }
         // Firing logic here
     }
