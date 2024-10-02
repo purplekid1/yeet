@@ -11,6 +11,7 @@ public class GameManger : MonoBehaviour
     public bool isPaused = false;
     public GameObject PauseMenu;
     public PlayerController playerData;
+    public Image crossAir;
 
     public Image healthBar;
     public TextMeshProUGUI clipCounter;
@@ -20,43 +21,49 @@ public class GameManger : MonoBehaviour
     {
         playerData = GameObject.Find("player").GetComponent<PlayerController>();
 
-
     }
 
     // Update is called once per frame
     void Update()
     {
-        healthBar.fillAmount = Mathf.Clamp((float)playerData.health / (float)playerData.maxHealth, 0, 1);
-
-        clipCounter.text = "Mags: " + playerData.currentClip + "/" + playerData.clipSize;
-         if (playerData.weaponID > 0 )
+        if (playerData != null)
         {
-            clipCounter.gameObject.SetActive(false);
 
-        } else
-        {
-            clipCounter.gameObject.SetActive(true);
+
+            healthBar.fillAmount = Mathf.Clamp((float)playerData.health / (float)playerData.maxHealth, 0, 1);
+
             clipCounter.text = "Mags: " + playerData.currentClip + "/" + playerData.clipSize;
-
-            ammoCounter.gameObject.SetActive(true);
-            ammoCounter.text = "Ammo: " + playerData.currentAmmo;
-
-            if (!isPaused && Input.GetKeyDown(KeyCode.Escape))
+            if (playerData.weaponID > 0)
             {
-                isPaused = true;
+                clipCounter.gameObject.SetActive(false);
 
-                PauseMenu.SetActive(true);
-
-                Time.timeScale = 0;
-
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
             }
-            else if (isPaused && Input.GetKeyDown(KeyCode.Escape))
+            else
             {
-                Resume();
-            }
+                clipCounter.gameObject.SetActive(true);
+                clipCounter.text = "Mags: " + playerData.currentClip + "/" + playerData.clipSize;
 
+                ammoCounter.gameObject.SetActive(true);
+                ammoCounter.text = "Ammo: " + playerData.currentAmmo;
+
+                if (!isPaused && Input.GetKeyDown(KeyCode.Escape))
+                {
+                    isPaused = true;
+
+                    PauseMenu.SetActive(true);
+                    crossAir.gameObject.SetActive(false);
+
+                    Time.timeScale = 0;
+
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                }
+                else if (isPaused && Input.GetKeyDown(KeyCode.Escape))
+                {
+                    Resume();
+                }
+
+            }
         }
     }
     public void Resume()
@@ -64,6 +71,7 @@ public class GameManger : MonoBehaviour
         isPaused = false;
 
         PauseMenu.SetActive(false);
+        crossAir.gameObject.SetActive(true);
 
         Time.timeScale = 1;
 
@@ -84,6 +92,6 @@ public class GameManger : MonoBehaviour
     public void LoadLevel(int sceneID)
     {
         SceneManager.LoadScene(sceneID);
-
+        Time.timeScale = 1;
     }
 }

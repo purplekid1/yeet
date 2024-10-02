@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
 {
     public Rigidbody myRB;
     public Camera playerCam;
+    public GameManger gm;
 
     Transform cameraHolder;
 
@@ -74,6 +75,7 @@ public class PlayerController : MonoBehaviour
         camRotation = Vector2.zero;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
+        gm = GameObject.Find("gameManager").GetComponent<GameManger>();
 
     }
 
@@ -81,110 +83,114 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
-        if (health <= 0)
+        if (!gm.isPaused)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
 
-        playerHeight = transform.localScale.y;
 
-        camRotation.x += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
-        camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
-
-        camRotation.y = Mathf.Clamp(camRotation.y, -camRotationLimit, camRotationLimit);
-        playerCam.transform.position = cameraHolder.position;
-
-        playerCam.transform.localRotation = Quaternion.Euler(-camRotation.y, camRotation.x, 0);
-        transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
-
-        if (Input.GetMouseButton(0) && canFire && currentClip >  0 && weaponID >= 0)
-        {
-            GameObject s = Instantiate(shot, weaponSlot.position, weaponSlot.rotation);
-            s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
-            Destroy(s, bulletLifeSpan);
-
-            canFire = false;
-            currentClip--;
-            StartCoroutine("cooldownFire");
-        }
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            reloadClip();
-        }
-
-        if (!sprinting)
-        {
-            if ((!sprintToggle && Input.GetKey(KeyCode.LeftShift)) || (sprintToggle && (Input.GetAxisRaw("vertical") > 0) && Input.GetKey(KeyCode.LeftShift)))
+            if (health <= 0)
             {
-                sprinting = true;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
-        }
-  
 
+            playerHeight = transform.localScale.y;
 
-        Vector3 temp = myRB.velocity;
+            camRotation.x += Input.GetAxisRaw("Mouse X") * mouseSensitivity;
+            camRotation.y += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
 
-        temp.x = Input.GetAxisRaw("Horizontal") * speed;
-        temp.z = Input.GetAxisRaw("Vertical") * speed;
+            camRotation.y = Mathf.Clamp(camRotation.y, -camRotationLimit, camRotationLimit);
+            playerCam.transform.position = cameraHolder.position;
 
-        if (sprinting)
-        {
-            temp.z *= sprintMult;
-            
-        }
+            playerCam.transform.localRotation = Quaternion.Euler(-camRotation.y, camRotation.x, 0);
+            transform.localRotation = Quaternion.AngleAxis(camRotation.x, Vector3.up);
 
-        if (sprinting && !sprintToggle && Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            sprinting = false;
-        }
-
-        if (Physics.Raycast(transform.position, -transform.up, groundDetection))
-        {
-            jumpOn = true;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            
-
-            if (jumpOn)
+            if (Input.GetMouseButton(0) && canFire && currentClip > 0 && weaponID >= 0)
             {
-                jumpOn = false;
-                temp.y = jumpHeight; 
+                GameObject s = Instantiate(shot, weaponSlot.transform.parent.position + (weaponSlot.transform.parent.forward * 1f), weaponSlot.transform.parent.rotation);
+                s.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * shotVel);
+                Destroy(s, bulletLifeSpan);
+
+                canFire = false;
+                currentClip--;
+                StartCoroutine("cooldownFire");
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                reloadClip();
+            }
+
+            if (!sprinting)
+            {
+                if ((!sprintToggle && Input.GetKey(KeyCode.LeftShift)) || (sprintToggle && (Input.GetAxisRaw("vertical") > 0) && Input.GetKey(KeyCode.LeftShift)))
+                {
+                    sprinting = true;
+                }
+            }
+
+
+
+            Vector3 temp = myRB.velocity;
+
+            temp.x = Input.GetAxisRaw("Horizontal") * speed;
+            temp.z = Input.GetAxisRaw("Vertical") * speed;
+
+            if (sprinting)
+            {
+                temp.z *= sprintMult;
 
             }
-            
-        }
 
-        
-        if (crouching)
-            myRB.velocity = (transform.forward * temp.z * crouchSpeed) + (transform.right * temp.x * crouchSpeed) + (transform.up * temp.y);
-        else
-            myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
-
-        if (Input.GetKey(KeyCode.LeftControl) || (Input.GetKey(KeyCode.C)))
-        {
-            if (transform.localScale.y > 0.5f)
+            if (sprinting && !sprintToggle && Input.GetKeyUp(KeyCode.LeftShift))
             {
-                transform.localScale -= Vector3.up * Time.deltaTime;
-
-                crouching = true;
+                sprinting = false;
             }
-            else transform.localScale = Vector3.one - (Vector3.up * 0.5f);
-        }
-        else
-        {
-            if (transform.localScale.y < 1)
+
+            if (Physics.Raycast(transform.position, -transform.up, groundDetection))
             {
-                transform.localScale += Vector3.up * Time.deltaTime;
-
-                crouching = false;
+                jumpOn = true;
             }
-            else transform.localScale = Vector3.one;
-        }
 
-       
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+
+
+                if (jumpOn)
+                {
+                    jumpOn = false;
+                    temp.y = jumpHeight;
+
+                }
+
+            }
+
+
+            if (crouching)
+                myRB.velocity = (transform.forward * temp.z * crouchSpeed) + (transform.right * temp.x * crouchSpeed) + (transform.up * temp.y);
+            else
+                myRB.velocity = (transform.forward * temp.z) + (transform.right * temp.x) + (transform.up * temp.y);
+
+            if (Input.GetKey(KeyCode.LeftControl) || (Input.GetKey(KeyCode.C)))
+            {
+                if (transform.localScale.y > 0.5f)
+                {
+                    transform.localScale -= Vector3.up * Time.deltaTime;
+
+                    crouching = true;
+                }
+                else transform.localScale = Vector3.one - (Vector3.up * 0.5f);
+            }
+            else
+            {
+                if (transform.localScale.y < 1)
+                {
+                    transform.localScale += Vector3.up * Time.deltaTime;
+
+                    crouching = false;
+                }
+                else transform.localScale = Vector3.one;
+            }
+
+        }
     }
 
 
@@ -273,19 +279,16 @@ public class PlayerController : MonoBehaviour
 
     public void reloadClip()
     {
-        // Check if already reloading or if the clip is full
         if (isReloading || currentClip >= clipSize)
         {
             return;
         }
 
-        isReloading = true; // Set reloading state
-        canFire = false; // Disable firing while reloading
+        isReloading = true;
+        canFire = false;
 
-        // Calculate how much ammo to reload
         float reloadCount = clipSize - currentClip;
 
-        // Perform the reload
         if (currentAmmo < reloadCount)
         {
             currentClip += currentAmmo; // Reload with whatever is left
@@ -309,11 +312,6 @@ public class PlayerController : MonoBehaviour
         canFire = true; // Enable firing again
     }
 
-    // Call this method when the reload button is pressed
-    public void OnReloadButtonPressed()
-    {
-        reloadClip();
-    }
 
     // Example of firing method
     public void Fire()
