@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c534ca92d1779ff41bf73f297b2cbcc0, type: 2}
+  - {fileID: 2100000, guid: 47f74d6fbef5dff4281bf5206dcf46ae, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -131,6 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myRB: {fileID: 0}
   playerCam: {fileID: 0}
+  gm: {fileID: 0}
   weaponSlot: {fileID: 0}
   shot: {fileID: 0}
   canFire: 1
@@ -146,7 +147,8 @@ MonoBehaviour:
   bulletLifeSpan: 0
   ammoPickUp: 0
   isReloading: 0
-  bulletCounter: {fileID: 0}
+  takenDamage: 0
+  damageCoolDown: 0.5
   maxHealth: 5
   health: 10
   healthPickUp: 5
@@ -160,9 +162,6 @@ MonoBehaviour:
   playerHeight: 1
   crouchSpeed: 5
   jumpOn: 0
-  isWallRunning: 0
-  leanAmount: 15
-  leanSpeed: 5
   sprintToggle: 0
   crouchingToggle: 0
   mouseSensitivity: 5

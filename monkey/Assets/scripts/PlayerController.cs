@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviour
     public float reloadAmt = 0;
     public float bulletLifeSpan = 0;
     public int ammoPickUp = 0;
+    public float BulletAngle = 90;
     public bool isReloading = false;
 
 
@@ -242,12 +243,12 @@ public class PlayerController : MonoBehaviour
 
             switch(other.gameObject.name) 
             {
-                case "Weapon1":
+                case "Rifle":
                 
                     weaponID = 0;
                     shotVel = 4500;
                     fireMode = 0;
-                    fireRate = 0.1f;
+                    fireRate = 0.5f;
                     currentClip = 20;
                     clipSize = 20;
                     maxAmmo = 400;
