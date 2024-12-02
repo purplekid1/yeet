@@ -5,59 +5,46 @@ using UnityEngine.AI;
 
 public class BasicEnemyController : MonoBehaviour
 {
-    public NavMeshAgent agent;
-    public Transform target;
-    public PlayerController pc;
-
+    public PlayerController player;
 
     [Header("Enemy Stats")]
     public int health = 3;
     public int maxHealth = 5;
     public int damageGiven = 1;
     public int damageReceived = 1;
-    public float pushBackForce = 7f;
+    public float pushBackForce = 10;
+    public float distanceDetection = 5;
 
 
+    // Start is called before the first frame update
     void Start()
     {
-        pc = GameObject.Find("player").GetComponent<PlayerController>();
-        agent = GetComponent<NavMeshAgent>();
+        player = GameObject.Find("Player").GetComponent<PlayerController>();
 
-
+        
     }
 
-    
+    // Update is called once per frame
     void Update()
     {
-
-        target = GameObject.Find("player").transform;
-        agent.destination = target.position;
-
-        if (health <= 0 )
-        {
+        if (health <= 0)
             Destroy(gameObject);
-        }
-
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "bullet")
+        if(collision.gameObject.tag == "bullet")
         {
             health -= damageReceived;
             Destroy(collision.gameObject);
         }
 
-        if (collision.gameObject.tag == "Player" && !pc.takenDamage)
+        if (collision.gameObject.tag == "Player" && !player.takenDamage)
         {
-            pc.health -= damageGiven;
-            pc.GetComponent<Rigidbody>().AddForce(transform.forward * pushBackForce);
-            pc.takenDamage = true;
-            pc.StartCoroutine("coolDownDamage");
-
-        }    
- 
+            player.takenDamage = true;
+            player.health -= damageGiven;
+            player.gameObject.GetComponent<Rigidbody>().AddForce(transform.forward * pushBackForce);
+            player.StartCoroutine("cooldownDamage");
+        }
     }
-
-
 }

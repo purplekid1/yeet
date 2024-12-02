@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 {
     public Rigidbody myRB;
     public Camera playerCam;
-    public GameManger gm;
+    public GameManager gm;
 
     Transform cameraHolder;
 
@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour
         camRotation = Vector2.zero;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
-        gm = GameObject.Find("gameManager").GetComponent<GameManger>();
+        gm = GameObject.Find("gameManager").GetComponent<GameManager>();
 
     }
 

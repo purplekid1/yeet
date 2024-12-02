@@ -668,13 +668,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 785835745}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9df35113202a2ae499049bf6cf54abef, type: 3}
+  m_Script: {fileID: 11500000, guid: 382e08cc679490c43b3616fc0cdba1ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   isPaused: 0
-  PauseMenu: {fileID: 0}
+  pauseMenu: {fileID: 0}
   playerData: {fileID: 0}
-  crossAir: {fileID: 0}
   healthBar: {fileID: 0}
   clipCounter: {fileID: 0}
   ammoCounter: {fileID: 0}
@@ -778,7 +777,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 785835746}
-        m_TargetAssemblyTypeName: GameManger, Assembly-CSharp
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: LoadLevel
         m_Mode: 3
         m_Arguments:
